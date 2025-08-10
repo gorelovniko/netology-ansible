@@ -1,0 +1,11 @@
+sources:
+  journald:
+    type: journald
+
+sinks:
+  clickhouse:
+    type: clickhouse
+    inputs: ["journald"]
+    host: "{{ clickhouse_host }}"
+    port: 8123
+    database: "{{ clickhouse_database }}"
