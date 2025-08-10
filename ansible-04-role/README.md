@@ -1,3 +1,3 @@
-[](clickhouse/README.md)  
-[](lighthouse-role/README.md)  
-[](vector-role/README.md)  
+[clickhouse-role](clickhouse/README.md)  
+[lighthouse-role](lighthouse-role/README.md)  
+[vector-role](vector-role/README.md)  
