@@ -1,28 +1,26 @@
 # version: '3'
 services:
   clickhouse-01:
-    image: pycontribs/centos:8
+    # image: pycontribs/ubuntu:latest
+    image: clickhouse/clickhouse-server:22.8
     container_name: clickhouse-01
     entrypoint: ["sleep", "infinity"]
     ports:
       - "8123:8123"
-    volumes:
-      - ./clickhouse/data:/var/lib/clickhouse
-      - ./clickhouse/config:/etc/clickhouse-server
+    tmpfs:  # Решение для PID-файла
+      - /var/run/clickhouse-server:uid=101,gid=101,mode=0755
     network_mode: bridge
   
   vector-01:
-    image: pycontribs/centos:8
+    image: timberio/vector:0.28.1-debian
     container_name: vector-01
     entrypoint: ["sleep", "infinity"]
-    volumes:
-      - ./vector:/etc/vector
     depends_on:
       - clickhouse-01
     network_mode: bridge
       
   lighthouse:
-    image: pycontribs/centos:8
+    image: pycontribs/ubuntu:latest
     container_name: lighthouse-01
     entrypoint: ["sleep", "infinity"]
     ports:

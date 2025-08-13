@@ -1,0 +1,11 @@
+---
+- name: Install nginx
+  include_tasks: 
+    file: nginx/main.yml
+
+- name: "Notify Handlers"
+  meta: flush_handlers
+
+- name: Install lighthouse
+  include_tasks: 
+    file: lighthouse/main.yml

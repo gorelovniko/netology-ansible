@@ -1,0 +1,22 @@
+---
+- name: Get lighthouse distrib
+  ansible.builtin.get_url:
+    url: "https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip"
+    dest: "./lighthouse.zip"
+- name: Unarchive lighthouse distrib into nginx
+  become: true
+  ansible.builtin.unarchive:
+    src: ./lighthouse.zip
+    dest: /var/www/html/
+    remote_src: yes
+  notify: restart nginx service
+- name: Make nginx config
+  become: true
+  ansible.builtin.template:
+    src: default.j2
+    dest: /etc/nginx/sites-enabled/default
+  notify: restart nginx service
+- name: Remove lighthouse distrib
+  ansible.builtin.file:
+    path: "./lighthouse.zip"
+    state: absent
