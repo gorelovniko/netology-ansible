@@ -1,5 +1,0 @@
----
-# vars file for vector-role
-
-vector_gpg_key: "https://repositories.timber.io/public/vector/gpg.3543DB2D0A2BC4B8.key"
-vector_repo: "deb [arch=amd64] https://repositories.timber.io/public/vector/deb/ubuntu focal main"

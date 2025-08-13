@@ -1,0 +1,34 @@
+# version: '3'
+services:
+  clickhouse-01:
+    image: pycontribs/centos:8
+    container_name: clickhouse-01
+    entrypoint: ["sleep", "infinity"]
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./clickhouse/data:/var/lib/clickhouse
+      - ./clickhouse/config:/etc/clickhouse-server
+    network_mode: bridge
+  
+  vector-01:
+    image: pycontribs/centos:8
+    container_name: vector-01
+    entrypoint: ["sleep", "infinity"]
+    volumes:
+      - ./vector:/etc/vector
+    depends_on:
+      - clickhouse-01
+    network_mode: bridge
+      
+  lighthouse:
+    image: pycontribs/centos:8
+    container_name: lighthouse-01
+    entrypoint: ["sleep", "infinity"]
+    ports:
+      - "80:80"
+    volumes:
+      - ./lighthouse:/etc/nginx/sites-enabled
+    depends_on:
+      - clickhouse-01
+    network_mode: bridge
