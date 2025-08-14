@@ -50,16 +50,18 @@
 #  ignore_errors: yes
 
 - name: Deploy Nginx config
+  become: true
   ansible.builtin.template:
     src: lighthouse.conf.j2
     dest: "{{ nginx_conf_dir }}/{{ nginx_conf_name }}.conf"
     mode: '0644'
-  notify: restart nginx
+  notify: restart nginx service
   tags: nginx
 
 - name: Disable default Nginx site
+  become: true
   ansible.builtin.file:
     path: "{{ nginx_conf_dir }}/default.conf"
     state: absent
-  notify: restart nginx
+  notify: restart nginx service
   tags: nginx

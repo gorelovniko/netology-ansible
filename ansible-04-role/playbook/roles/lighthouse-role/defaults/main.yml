@@ -1,6 +1,11 @@
 ---
 nginx_version: "1.28.0"
 
+# Настройки Lighthouse
+lighthouse_repo: "https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip"
+lighthouse_install_dir: "/var/www/html"
+lighthouse_version: "master"
+
 # Настройки Nginx
 nginx_conf_name: "lighthouse"
 nginx_conf_dir: "/etc/nginx/conf.d"

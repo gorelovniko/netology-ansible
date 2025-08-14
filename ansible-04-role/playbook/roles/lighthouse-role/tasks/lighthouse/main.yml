@@ -36,6 +36,7 @@
     - /var/www/html
 
 - name: Ensure directories exist
+  become: true
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -43,7 +44,6 @@
     owner: "{{ nginx_user }}"
     group: "{{ nginx_group }}"
   loop:
-    #- "{{ lighthouse_install_dir }}"
     - "{{ nginx_conf_dir }}"
   tags: nginx
 

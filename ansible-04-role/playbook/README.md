@@ -1,4 +1,6 @@
-# Playbook для установки Clickhouse, Vector и LightHouse
+# Домашнее задание "Работа с roles" - `Горелов Николай`
+
+## Playbook для установки Clickhouse, Vector и LightHouse
 ## Описание
 Playbook использует следующие роли:  
 [clickhouse](https://github.com/AlexeySetevoi/ansible-clickhouse)  
