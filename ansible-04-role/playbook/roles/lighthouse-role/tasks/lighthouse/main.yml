@@ -1,22 +1,118 @@
 ---
-- name: Get lighthouse distrib
-  ansible.builtin.get_url:
-    url: "https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip"
-    dest: "./lighthouse.zip"
+# - name: Get lighthouse distrib
+#   ansible.builtin.get_url:
+#     url: "https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip"
+#     dest: "./lighthouse.zip"
+
+- name: Download Lighthouse using curl
+  ansible.builtin.command: >
+    curl -fL -o /tmp/lighthouse.zip
+    https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip
+  args:
+    creates: /tmp/lighthouse.zip  # Не загружать повторно, если файл уже существует
+  register: download_result
+  failed_when: 
+    - download_result.rc != 0
+    - "'not modified' not in download_result.stderr"  # Игнорировать, если файл не изменился
+
+- name: Ensure web directory exists
+  become: true
+  ansible.builtin.file:
+    path: /var/www/html/
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Ensure Nginx directories exist
+  become: true 
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /etc/nginx/sites-enabled
+    - /etc/nginx/sites-available
+    - /var/www/html
+
+- name: Ensure directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+  loop:
+    #- "{{ lighthouse_install_dir }}"
+    - "{{ nginx_conf_dir }}"
+  tags: nginx
+
 - name: Unarchive lighthouse distrib into nginx
   become: true
   ansible.builtin.unarchive:
-    src: ./lighthouse.zip
+    src: /tmp/lighthouse.zip
     dest: /var/www/html/
     remote_src: yes
   notify: restart nginx service
+
 - name: Make nginx config
   become: true
   ansible.builtin.template:
     src: default.j2
-    dest: /etc/nginx/sites-enabled/default
+    dest: /etc/nginx/sites-available/lighthouse-master
   notify: restart nginx service
+
+- name: Enable Lighthouse site
+  become: true
+  file:
+    src: /etc/nginx/sites-available/lighthouse-master
+    dest: /etc/nginx/sites-enabled/lighthouse-master
+    state: link
+    force: yes
+  notify: restart nginx service
+
 - name: Remove lighthouse distrib
   ansible.builtin.file:
-    path: "./lighthouse.zip"
+    path: "/tmp/lighthouse.zip"
     state: absent
+
+
+
+# - name: Update SSL packages
+#   apt:
+#     name:
+#       - ca-certificates
+#       - openssl
+#       - python3-urllib3
+#     state: latest
+#     update_cache: yes
+
+# # 2. Устанавливаем curl для надежной загрузки
+# - name: Install curl
+#   apt:
+#     name: curl
+#     state: present
+
+# # 3. Скачиваем Lighthouse через curl
+# - name: Download Lighthouse (secure method)
+#   command: >
+#     curl -fL -o /tmp/lighthouse-master.zip
+#     https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip
+#   args:
+#     creates: /tmp/lighthouse-master.zip
+
+# # 4. Распаковываем архив
+# - name: Extract Lighthouse
+#   unarchive:
+#     src: /tmp/lighthouse-master.zip
+#     dest: /opt/
+#     remote_src: yes
+#     owner: www-data
+#     group: www-data
+
+# # 5. Настраиваем Lighthouse
+# - name: Configure Lighthouse
+#   file:
+#     path: /opt/lighthouse
+#     src: /opt/lighthouse-master
+#     state: link

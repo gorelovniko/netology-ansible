@@ -1,0 +1,23 @@
+server {
+    listen       {{ nginx_port }};
+    server_name  {{ ansible_host }};
+
+    access_log  /var/log/nginx/lighthouse.access.log;
+    error_log   /var/log/nginx/lighthouse.error.log;
+
+    root   {{ lighthouse_install_dir }}/lighthouse-{{ lighthouse_version }};
+    index  index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    location ~ /\. {
+        deny all;
+    }
+}

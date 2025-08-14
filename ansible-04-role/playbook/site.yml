@@ -1,16 +1,28 @@
 ---
+# - hosts: all
+#   pre_tasks:
+#     - name: Ensure PID directory exists
+#       file:
+#         path: /var/run/clickhouse-server
+#         state: directory
+#         owner: 101
+#         group: 101
+#         mode: '0755'
+
 - name: Install Clickhouse
-  hosts: clickhouse
+  hosts: clickhouse-01
   roles:
     - clickhouse-role
+  tags: clickhouse-01
 
 - name: Install Vector
-  hosts: vector
+  hosts: vector-01
   roles:
     - vector-role
+  tags: vector-01
 
 - name: Install Lighthouse
-  hosts: lighthouse
+  hosts: lighthouse-01
   pre_tasks:
     - name: install unzip
       become: true
@@ -20,3 +32,4 @@
         update_cache: yes
   roles:
     - lighthouse-role
+  tags: lighthouse-01

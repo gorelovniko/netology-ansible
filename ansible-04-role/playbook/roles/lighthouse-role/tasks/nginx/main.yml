@@ -1,8 +1,65 @@
 ---
-- name: Install nginx
+# - name: Install nginx
+#   become: true
+#   ansible.builtin.apt:
+#     name: nginx={{ nginx_version }}*
+#     state: present
+#     update_cache: yes
+#   notify: restart nginx service
+
+- name: Обновление системных пакетов
   become: true
-  ansible.builtin.apt:
-    name: nginx={{ nginx_version }}*
-    state: present
+  apt:
+    name:
+      - ca-certificates
+      - openssl
+      - python3-urllib3
+    state: latest
     update_cache: yes
-  notify: restart nginx service
+
+# 2. Альтернативный метод загрузки ключа
+- name: Загрузка ключа NGINX через curl
+  become: true
+  command: >
+    curl -fsSL https://nginx.org/keys/nginx_signing.key -o /tmp/nginx_signing.key
+  args:
+    creates: /tmp/nginx_signing.key
+
+- name: Добавление ключа из файла
+  become: true
+  apt_key:
+    file: /tmp/nginx_signing.key
+    state: present
+
+# 3. Добавление репозитория
+- name: Настройка репозитория NGINX
+  become: true
+  apt_repository:
+    repo: "deb http://nginx.org/packages/ubuntu/ {{ ansible_distribution_release }} nginx"
+    state: present
+    filename: nginx-official
+    update_cache: yes
+
+# 4. Установка NGINX
+- name: Установка NGINX
+  become: true
+  apt:
+    name: "nginx={{ nginx_version }}*"
+    state: present
+  register: nginx_install
+#  ignore_errors: yes
+
+- name: Deploy Nginx config
+  ansible.builtin.template:
+    src: lighthouse.conf.j2
+    dest: "{{ nginx_conf_dir }}/{{ nginx_conf_name }}.conf"
+    mode: '0644'
+  notify: restart nginx
+  tags: nginx
+
+- name: Disable default Nginx site
+  ansible.builtin.file:
+    path: "{{ nginx_conf_dir }}/default.conf"
+    state: absent
+  notify: restart nginx
+  tags: nginx

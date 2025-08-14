@@ -1,2 +1,9 @@
 ---
-nginx_version: "1.18.0"
+nginx_version: "1.28.0"
+
+# Настройки Nginx
+nginx_conf_name: "lighthouse"
+nginx_conf_dir: "/etc/nginx/conf.d"
+nginx_user: "www-data"
+nginx_group: "www-data"
+nginx_port: 80
