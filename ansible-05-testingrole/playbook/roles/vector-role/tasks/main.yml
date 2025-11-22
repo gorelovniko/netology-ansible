@@ -1,0 +1,62 @@
+---
+- name: Copy Vector .deb package from local files
+  copy:
+    src: vector_0.25.2-1_amd64.deb
+    dest: /tmp/vector_0.25.2-1_amd64.deb
+    mode: '0644'
+  become: true
+  when: ansible_facts.os_family == "Debian"
+
+- name: Copy Vector .rpm package from local files
+  copy:
+    src: vector-0.25.2-1.x86_64.rpm
+    dest: /tmp/vector-0.25.2-1.x86_64.rpm
+    mode: '0644'
+  become: true
+  when: ansible_facts.os_family == "RedHat"
+
+- name: Install Vector package (Debian)
+  apt:
+    deb: /tmp/vector_0.25.2-1_amd64.deb
+  become: true
+  when: ansible_facts.os_family == "Debian"
+
+- name: Install Vector package (RedHat)
+  dnf:
+    name: /tmp/vector-0.25.2-1.x86_64.rpm
+    state: present
+    disable_gpg_check: yes
+  become: true
+  when: ansible_facts.os_family == "RedHat"
+
+- name: Ensure Vector directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  become: true
+  loop:
+    - /etc/vector
+    - /var/lib/vector
+  when: ansible_user_id == "root"
+
+- name: Create basic Vector configuration
+  copy:
+    content: |
+      [sources.in]
+      type = "stdin"
+
+      [sinks.out]
+      type = "console"
+      inputs = ["in"]
+    dest: /etc/vector/vector.yaml
+    mode: '0644'
+  become: true
+  when: ansible_user_id == "root"
+
+- name: Manage vector service (only if enabled)
+  systemd:
+    name: vector
+    state: started
+    enabled: yes
+  when: vector_manage_service | bool

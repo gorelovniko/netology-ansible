@@ -1,0 +1,237 @@
+# # ---
+# # # This is an example playbook to execute Ansible tests.
+
+# # - name: Verify
+# #   hosts: all
+# #   gather_facts: false
+# #   tasks:
+# #     - name: Example assertion
+# #       ansible.builtin.assert:
+# #         that: true
+
+
+# ---
+# - name: Verify
+#   hosts: all
+#   tasks:
+#     - name: Check if vector is installed
+#       command: vector --version
+#       register: vector_version
+#       changed_when: false
+#       ignore_errors: true
+
+#     - name: Display vector version
+#       debug:
+#         msg: "Vector version: {{ vector_version.stdout }}"
+
+#     - name: Assert vector is installed
+#       assert:
+#         that:
+#           - vector_version.rc == 0
+#         success_msg: "Vector is installed"
+#         fail_msg: "Vector is not installed"
+
+#     - name: Check vector config syntax
+#       command: vector validate --config-toml /etc/vector/vector.toml
+#       register: vector_validate
+#       changed_when: false
+#       ignore_errors: true
+
+#     - name: Assert config is valid
+#       assert:
+#         that:
+#           - vector_validate.rc == 0
+#         success_msg: "Vector config is valid"
+#         fail_msg: "Vector config is invalid"
+
+#     - name: Check if vector service is running
+#       systemd:
+#         name: vector
+#         state: started
+#         enabled: yes
+#       register: vector_service
+#       ignore_errors: true
+
+#     - name: Assert vector service is running
+#       assert:
+#         that:
+#           - vector_service is succeeded
+#         success_msg: "Vector service is running and enabled"
+#         fail_msg: "Vector service is not running or not enabled"
+
+
+
+
+# ---
+# - name: Verify
+#   hosts: all
+#   become: true
+#   tasks:
+#     - name: Check if vector binary exists
+#       stat:
+#         path: /usr/bin/vector
+#       register: vector_binary
+
+#     - name: Assert vector binary exists
+#       assert:
+#         that:
+#           - vector_binary.stat.exists
+#         success_msg: "Vector binary exists"
+#         fail_msg: "Vector binary does not exist"
+
+#     - name: Get vector version
+#       command: vector --version
+#       register: vector_version
+#       changed_when: false
+#       ignore_errors: true
+
+#     - name: Display vector version
+#       debug:
+#         msg: "Vector version: {{ vector_version.stdout }}"
+
+#     - name: Assert vector runs correctly
+#       assert:
+#         that:
+#           - vector_version.rc == 0
+#         success_msg: "Vector runs correctly"
+#         fail_msg: "Vector does not run correctly"
+
+#     - name: Check if vector config file exists
+#       stat:
+#         path: /etc/vector/vector.toml
+#       register: vector_config
+
+#     - name: Assert config file exists
+#       assert:
+#         that:
+#           - vector_config.stat.exists
+#         success_msg: "Vector config file exists"
+#         fail_msg: "Vector config file does not exist"
+
+#     - name: Check vector config syntax
+#       command: vector validate --config-toml /etc/vector/vector.toml
+#       register: vector_validate
+#       changed_when: false
+#       ignore_errors: true
+
+#     - name: Assert config is valid
+#       assert:
+#         that:
+#           - vector_validate.rc == 0
+#         success_msg: "Vector config is valid"
+#         fail_msg: "Vector config is invalid"
+
+#     - name: Try to start vector service
+#       systemd:
+#         name: vector
+#         state: started
+#         enabled: yes
+#         daemon_reload: yes
+#       register: vector_service
+#       ignore_errors: true
+
+#     - name: Wait a moment for service to start
+#       pause:
+#         seconds: 5
+
+#     - name: Check vector service status
+#       command: systemctl is-active vector
+#       register: vector_status
+#       changed_when: false
+#       failed_when: false
+
+#     - name: Display service status
+#       debug:
+#         msg: "Vector service status: {{ vector_status.stdout }}"
+
+#     - name: Assert service is running or active
+#       assert:
+#         that:
+#           - vector_status.stdout in ['active', 'activating', 'reloading']
+#         success_msg: "Vector service is running"
+#         fail_msg: "Vector service is not running (status: {{ vector_status.stdout }})"
+
+
+# ---
+# - name: Verify Vector without systemd
+#   hosts: all
+#   become: true
+#   tasks:
+#     - name: Check vector binary exists
+#       stat:
+#         path: /usr/bin/vector
+#       register: bin_check
+
+#     - name: Assert vector binary exists
+#       assert:
+#         that: bin_check.stat.exists
+
+#     - name: Get vector version
+#       command: /usr/bin/vector --version
+#       register: version_out
+#       changed_when: false
+
+#     - name: Validate config file
+#       command: /usr/bin/vector validate --config-toml /etc/vector/vector.toml
+#       register: validate_out
+#       changed_when: false
+
+#     - name: Test config with dry-run (non-daemon mode)
+#       command: timeout 10s /usr/bin/vector --config-toml /etc/vector/vector.toml --dry-run
+#       register: dryrun_out
+#       changed_when: false
+#       ignore_errors: yes
+
+#     - name: Assert dry-run succeeded or failed gracefully
+#       assert:
+#         that:
+#           - dryrun_out.rc in [0, 3]  # 3 = "no sources", still OK
+#         fail_msg: "Vector dry-run failed with unexpected error"
+
+
+---
+- name: Verify Vector without systemd
+  hosts: all
+  become: true
+  tasks:
+    - name: Check vector binary exists
+      stat:
+        path: /usr/bin/vector
+      register: bin_check
+
+    - name: Assert vector binary exists
+      assert:
+        that: bin_check.stat.exists
+        success_msg: "Vector binary is present"
+        fail_msg: "Vector binary is missing"
+
+    - name: Get vector version
+      command: /usr/bin/vector --version
+      register: version_out
+      changed_when: false
+
+    - name: Display vector version
+      debug:
+        msg: "Vector version: {{ version_out.stdout }}"
+
+    - name: Ensure config file exists
+      stat:
+        path: /etc/vector/vector.toml
+      register: config_check
+
+    - name: Assert config file exists
+      assert:
+        that: config_check.stat.exists
+        success_msg: "Vector config file exists"
+        fail_msg: "Vector config file is missing"
+
+    - name: Validate vector configuration
+      command: /usr/bin/vector validate --config-toml /etc/vector/vector.toml
+      register: validate_out
+      changed_when: false
+
+    - name: Assert config is valid
+      assert:
+        that: validate_out.rc == 0
+        success_msg: "Vector configuration is valid"
+        fail_msg: "Vector configuration is invalid"

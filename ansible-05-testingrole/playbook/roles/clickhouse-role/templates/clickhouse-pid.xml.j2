@@ -1,0 +1,7 @@
+<yandex>
+  {% if pid_file is defined %}
+  <pid>{{ pid_file }}</pid>
+  {% else %}
+  <pid>/var/run/clickhouse-server/clickhouse-server.pid</pid>
+  {% endif %}
+</yandex>

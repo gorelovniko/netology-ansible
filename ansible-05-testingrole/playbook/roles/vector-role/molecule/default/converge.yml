@@ -1,0 +1,17 @@
+# ---
+# - name: Converge
+#   hosts: all
+#   tasks:
+#     - name: "Include vector-role"
+#       include_role:
+#         name: "vector-role"
+
+
+- name: Converge
+  hosts: all
+  vars:
+    vector_manage_service: false  # отключаем управление сервисом в тестах
+  tasks:
+    - name: Include vector role
+      include_role:
+        name: vector-role

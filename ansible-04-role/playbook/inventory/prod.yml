@@ -4,7 +4,7 @@ clickhouse:
     clickhouse-01:
       # ansible_host: clickhouse-01
       # ansible_connection: docker
-      ansible_host: 158.160.47.165
+      ansible_host: 158.160.196.9
       ansible_user: nimda
 
 vector:
@@ -12,7 +12,7 @@ vector:
     vector-01:
       # ansible_host: vector-01
       # ansible_connection: docker
-      ansible_host: 158.160.55.115
+      ansible_host: 158.160.199.141
       ansible_user: nimda
 
 lighthouse:
@@ -20,5 +20,5 @@ lighthouse:
     lighthouse-01:
       # ansible_host: lighthouse-01
       # ansible_connection: docker
-      ansible_host: 89.169.148.46
+      ansible_host: 158.160.199.197
       ansible_user: nimda

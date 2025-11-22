@@ -1,0 +1,106 @@
+# ---
+# dependency:
+#   name: galaxy
+# driver:
+#   name: docker
+# platforms:
+#   - name: instance
+#     image: quay.io/centos/centos:stream8
+#     pre_build_image: true
+# provisioner:
+#   name: ansible
+# verifier:
+#   name: ansible
+
+# ---
+# dependency:
+#   name: galaxy
+# driver:
+#   name: docker  # or your specific driver
+# platforms:
+#   - name: instance-oraclelinux
+#     image: oraclelinux:8
+#     # your other platform settings
+#   - name: instance-ubuntu
+#     image: ubuntu:20.04
+#     # your other platform settings
+# provisioner:
+#   name: ansible
+#   config_options:
+#     defaults:
+#       remote_tmp: /tmp/.ansible/tmp
+#       host_key_checking: False
+# verifier:
+#   name: ansible
+
+
+# ---
+# dependency:
+#   name: galaxy
+# driver:
+#   name: docker
+# platforms:
+#   - name: rockylinux8
+#     image: docker.io/rockylinux:8
+#     pre_build_image: true
+#   - name: ubuntu
+#     image: docker.io/pycontribs/ubuntu:latest
+#     pre_build_image: true
+# provisioner:
+#   name: ansible
+#   log: true
+# verifier:
+#   name: ansible
+
+# ---
+# dependency:
+#   name: galaxy
+# driver:
+#   name: docker
+# platforms:
+#   - name: rockylinux9
+#     image: docker.io/rockylinux:9
+#     pre_build_image: true
+#     capabilities:
+#       - SYS_ADMIN
+#   - name: ubuntu24
+#     image: docker.io/ubuntu:24.04
+#     pre_build_image: true
+# provisioner:
+#   name: ansible
+#   log: true
+# verifier:
+#   name: ansible
+
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: rockylinux9
+    image: docker.io/geerlingguy/docker-rockylinux9-ansible:latest
+    pre_build_image: true
+    capabilities:
+      - SYS_ADMIN
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+  - name: ubuntu24
+    image: docker.io/geerlingguy/docker-ubuntu2404-ansible:latest
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      interpreter_python: auto_silent
+  playbooks:
+    prepare: playbooks/prepare.yml
+  log: true
+verifier:
+  name: ansible
