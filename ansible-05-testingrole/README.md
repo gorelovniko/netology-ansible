@@ -348,4 +348,14 @@ py39-ansible210 installdeps: -rtox-requirements.txt, ansible<3.0
 
 </details>
 
+
+Провел исправления и получил результат:
+
+![](./img/3.png)
+
+
+В завершении коммитим и тегируем:  
+
+![](./img/4.png)  
+
 ---
