@@ -7,6 +7,7 @@
 
 ![](./img/1.png)
 
+---
 
 2. **vector-role**  
 
@@ -299,4 +300,15 @@ INFO     Pruning extra files from scenario ephemeral directory
 ```
 
 </details>
+
+---
+
+3. **Тег**  
+
+![]()
+
+---
+
+
+### Tox
 
