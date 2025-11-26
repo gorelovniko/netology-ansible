@@ -1,0 +1,8 @@
+---
+- name: Test create_file role
+  hosts: localhost
+  roles:
+    - role: create_file
+      vars:
+        file_path: "/tmp/role_created_file.txt"
+        file_content: "This file was created by my custom role!"
