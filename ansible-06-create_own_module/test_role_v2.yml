@@ -1,0 +1,14 @@
+---
+- name: Test create_file role from collection
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - my_own_namespace.yandex_cloud_elk
+
+  vars:
+    file_path: "/tmp/role_created_file.txt"
+    file_content: "This file was created by my custom role via collection!"
+    file_mode: '0644'
+
+  roles:
+    - create_file
