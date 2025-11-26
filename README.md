@@ -9,6 +9,7 @@
 
 [Работа с roles](ansible-04-role/README.md)
 
-[Тестирование roles]()  
+[Тестирование roles](ansible-05-testingrole/README.md)  
 
-[Создание собственных модулей]()
+[Создание собственных модулей](ansible-06-create_own_module)
+
